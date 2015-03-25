@@ -9,8 +9,10 @@ module.exports = {
   index: function(req, res) {
     var we = req.getWe();
 
-    res.locals.template = 'home/index';
+    res.redirect('/admin');
 
-    res.view({ title: 'Express' });
+    // res.locals.template = 'home/index';
+
+    // res.view({ title: 'Express' });
   }
 }

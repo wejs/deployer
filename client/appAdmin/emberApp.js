@@ -2,7 +2,6 @@
 * your ember.js app
 * This file runs after load ember.js features like components
 */
-console.warn('loaddd')
 // start app after
 App = Ember.WeApplication.create();
 App.deferReadiness();

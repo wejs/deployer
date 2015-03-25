@@ -90,17 +90,25 @@ module.exports.clientside = {
           // },
           //
 
-          {
-            i18nText: 'menu.link.page',
-            type: 'resource',
-            model: 'page'
-          },
+          // {
+          //   i18nText: 'menu.link.page',
+          //   type: 'resource',
+          //   model: 'page'
+          // },
+
+          // {
+          //   i18nText: 'menu.link.vocabulary',
+          //   type: 'resource',
+          //   model: 'vocabularies'
+          // },
+
 
           {
-            i18nText: 'menu.link.vocabulary',
+            i18nText: 'menu.link.codeProject',
             type: 'resource',
-            model: 'vocabularies'
+            model: 'codeProjects'
           },
+
 
           {
             i18nText: 'menu.link.user',
@@ -108,11 +116,12 @@ module.exports.clientside = {
             model: 'user'
           },
 
-          {
-            i18nText: 'menu.link.permissions',
-            type: 'resource',
-            model: 'permissions'
-          }
+
+          // {
+          //   i18nText: 'menu.link.permissions',
+          //   type: 'resource',
+          //   model: 'permissions'
+          // }
         ]
       }
     }

@@ -59,10 +59,10 @@ Permissions = {
    * @type {Object}
    */
   defaultRoles: {
-    authenticated: null,
-    unAuthenticated: null,
-    owner: null,
-    administrator: null
+    authenticated: 'authenticated',
+    unAuthenticated: 'unAuthenticated',
+    owner: 'owner',
+    administrator: 'administrator'
   },
 
   currentUserRolesCache: null,
@@ -82,24 +82,25 @@ Permissions = {
 
     // cache var
     if (Permissions.currentUserRolesCache) {
-      roles = Permissions.currentUserRolesCache;
-    } else {
-      // if dont have cache
-      // unAuthenticated
-      if ( !App.get('currentUser.id') ) {
-        return [ Permissions.defaultRoles.unAuthenticated ];
-      }
-
-      var rolesObj = App.get('currentUser.roles').toArray();
-
-      for (var i = rolesObj.length - 1; i >= 0; i--) {
-        roles.push(Ember.get(rolesObj[i], 'id'));
-      }
-
-      roles.push(Permissions.defaultRoles.authenticated);
-
-      Permissions.currentUserRolesCache = roles;
+      return Permissions.currentUserRolesCache;
     }
+
+    // if dont have cache
+    // unAuthenticated
+    if ( !App.get('currentUser.id') ) {
+      return [ Permissions.defaultRoles.unAuthenticated ];
+    }
+
+    var rolesObj = App.get('currentUser.roles').toArray();
+
+    for (var i = rolesObj.length - 1; i >= 0; i--) {
+      roles.push(Ember.get(rolesObj[i], 'name'));
+    }
+
+    roles.push(Permissions.defaultRoles.authenticated);
+
+    Permissions.currentUserRolesCache = roles;
+
     return roles;
   },
 
@@ -111,6 +112,7 @@ Permissions = {
    * @return {boolean} true for allow and false for block
    */
   can: function(name, modelName, model) {
+    if (App.configs.acl.disabled) return true;
     // admin users has all permissions
     if ( App.get('currentUser.isAdmin')) return true;
 
@@ -120,7 +122,14 @@ Permissions = {
     if (typeof(Permissions.canCache[canName]) !== 'undefined' )
       return Permissions.canCache[canName];
 
+    // load roles
     var roles = Permissions.currentUserRoles();
+    // add owner role
+    if (Permissions.isOwner(modelName, model))
+      roles.push(Permissions.defaultRoles.owner);
+
+    // return true if has admin role
+    if ( roles.indexOf('administrator') > -1 ) return true;
 
     var permission = Permissions.get(name);
     if (!permission) {
@@ -134,9 +143,6 @@ Permissions = {
     if (!permissionRoles || permissionRoles.length < 1) {
       return false;
     }
-
-    if (Permissions.isOwner(modelName, model))
-      roles.push(Permissions.defaultRoles.owner);
 
     for (var i = permissionRoles.length - 1; i >= 0; i--) {
       if ( roles.indexOf(permissionRoles[i]) > -1 ) {
@@ -179,48 +185,84 @@ Permissions = {
   },
 
   rolesIsLoaded: false,
+
+  /**
+   * Load and register all roles, use in app bootstrap
+   *
+   * @param  {Object} store Ember data store
+   * @return {Object}       Promisse Ember.RSVP
+   */
   loadAndRegisterAllRoles: function(store) {
-    if (Permissions.rolesIsLoaded) return;
-    var rolesUrl = '/role';
-    var host = Ember.get('App.configs.permissionHost');
-    if ( host ) {
-      rolesUrl = host + rolesUrl;
-    }
+    if (Permissions.rolesIsLoaded) return Ember.RSVP.resolve();
 
-    return $.getJSON( rolesUrl )
-    .done(function afterLoadData(data) {
-      if (data.role) {
-        store.pushMany('role', data.role);
-        data.role.forEach(function(role) {
-          Permissions.defaultRoles[role.name] = role.id;
-        })
-
-        Permissions.rolesIsLoaded = true;
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      var rolesUrl = '/role';
+      var host = Ember.get('App.configs.permissionHost');
+      if ( host ) {
+        rolesUrl = host + rolesUrl;
       }
-    })
-    .fail(function (data) {
-      Ember.Logger.error('Error on load roles' , data);
-    })
+
+      return $.getJSON( rolesUrl )
+      .done(function afterLoadData(data) {
+        if (data.role) {
+          store.pushMany('role', data.role);
+          data.role.forEach(function(role) {
+            Permissions.defaultRoles[role.name] = role.name;
+          })
+
+          Permissions.rolesIsLoaded = true;
+        }
+
+        resolve();
+      })
+      .fail(function (result) {
+        if (result.status == '403') return resolve();
+        Ember.Logger.error('Error on load roles' , result);
+
+        return reject(result);
+      })
+    });
   },
 
+  /**
+   * Load and register all permissions and roles, use in app bootstrap
+   *
+   * @param  {Object} store Ember data store
+   * @return {Object}       Promisse Ember.RSVP
+   */
   loadAndRegisterAllPermissions: function(store) {
-    Permissions.loadAndRegisterAllRoles(store);
-
-    var permissionsUrl = '/permission';
-    var permissionsHost = Ember.get('App.configs.permissionHost');
-    if ( permissionsHost ) {
-      permissionsUrl = permissionsHost + permissionsUrl;
-    }
-
-    return $.getJSON( permissionsUrl )
-    .done(function afterLoadData(data) {
-      if (data.permission) {
-        // register all permissions
-        Permissions.registerAll(data.permission);
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      var permissionsUrl = '/permission';
+      var permissionsHost = Ember.get('App.configs.permissionHost');
+      if ( permissionsHost ) {
+        permissionsUrl = permissionsHost + permissionsUrl;
       }
-    })
-    .fail(function (data) {
-      Ember.Logger.error('Error on load permissions' , data);
-    })
+
+      return $.getJSON( permissionsUrl )
+      .done(function afterLoadData(data) {
+        if (data.permission) {
+          // register all permissions
+          Permissions.registerAll(data.permission);
+        }
+
+        // on success
+        resolve(Permissions._perms);
+      })
+
+      .fail(function (result) {
+        if (result.status == '403') return resolve(Permissions._perms);
+
+        Ember.Logger.error('Error on load permissions' , result);
+        // on failure
+        return reject(result);
+      })
+    });
+  },
+
+  loadAndRegisterAllRolesAndPermissions: function(store) {
+    return new Ember.RSVP.hash({
+      roles: Permissions.loadAndRegisterAllRoles(store),
+      permissions: Permissions.loadAndRegisterAllPermissions(store),
+    });
   }
 };
