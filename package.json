@@ -11,7 +11,8 @@
     "lodash": "^3.3.1",
     "we-core": "0.3.0",
     "we-theme-admin-default": "0.3.0",
-    "we-theme-site-wejs": "0.3.0"
+    "we-theme-site-wejs": "0.3.0",
+    "we-plugin-deploy": "0.3.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
