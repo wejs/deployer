@@ -40,4 +40,6 @@ files/tmp
 # private files
 files/private
 
+local.js
+
 .tmp
