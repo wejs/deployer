@@ -52,7 +52,7 @@ we.bootstrap(function(err, we) {
   .done(function (err, user) {
     if (err) return doneAll(err);
 
-    we.log.info('New User: ', user);
+    we.log.info('New User: ', user.get());
 
     user.updatePassword(userStub.password , function(error) {
       if (error) return doneAll(error);
