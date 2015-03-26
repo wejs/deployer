@@ -3243,13 +3243,36 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 });Ember.TEMPLATES['codeProjects/index'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, helper, options, self=this, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  var buffer = '', stack1, helper, options, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
+  var buffer = '', helper, options;
+  data.buffer.push("\n    ");
+  data.buffer.push(escapeExpression((helper = helpers['we-loading'] || (depth0 && depth0['we-loading']),options={hash:{
+    'isLoading': ("isLoading"),
+    'textDone': (""),
+    'textLoading': ("Loading...")
+  },hashTypes:{'isLoading': "ID",'textDone': "STRING",'textLoading': "STRING"},hashContexts:{'isLoading': depth0,'textDone': depth0,'textLoading': depth0},contexts:[],types:[],data:data},helper ? helper.call(depth0, options) : helperMissing.call(depth0, "we-loading", options))));
+  data.buffer.push("\n  ");
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = '', stack1;
+  data.buffer.push("\n    <pre>");
+  stack1 = helpers._triageMustache.call(depth0, "projectsStatus", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</pre>\n  ");
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
   var buffer = '', stack1, helper, options;
   data.buffer.push("\n      <tr>\n        <th>\n          ");
-  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "codeProject", "record.name", options) : helperMissing.call(depth0, "link-to", "codeProject", "record.name", options));
+  stack1 = (helper = helpers['link-to'] || (depth0 && depth0['link-to']),options={hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0,depth0],types:["STRING","ID"],data:data},helper ? helper.call(depth0, "codeProject", "record.name", options) : helperMissing.call(depth0, "link-to", "codeProject", "record.name", options));
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n        </th>\n        <td>\n          ");
   stack1 = helpers._triageMustache.call(depth0, "record.folder", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
@@ -3260,7 +3283,7 @@ function program1(depth0,data) {
   data.buffer.push("\n        </td>\n      </tr>\n    ");
   return buffer;
   }
-function program2(depth0,data) {
+function program6(depth0,data) {
   
   var buffer = '', stack1;
   data.buffer.push("\n            ");
@@ -3272,8 +3295,13 @@ function program2(depth0,data) {
 
   data.buffer.push("<h2>");
   data.buffer.push(escapeExpression((helper = helpers.t || (depth0 && depth0.t),options={hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data},helper ? helper.call(depth0, "admin.codeproject.title", options) : helperMissing.call(depth0, "t", "admin.codeproject.title", options))));
-  data.buffer.push("</h2>\n\n<br>\n\n<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Folder</th>\n      <th>Description</th>\n    </tr>\n  </thead>\n  <tbody>\n    ");
-  stack1 = helpers.each.call(depth0, "record", "in", "data.codeproject", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
+  data.buffer.push("</h2>\n\n<br>\n\n<div class=\"all-project-status\">\n  ");
+  stack1 = helpers['if'].call(depth0, "isLoading", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n  <div>\n  <button ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "triggetLoadAllProjectStatus", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["STRING"],data:data})));
+  data.buffer.push(" class=\"btn btn-default btn-sm\">reload status</button>\n  </div>\n</div>\n\n<br>\n<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Folder</th>\n      <th>Description</th>\n    </tr>\n  </thead>\n  <tbody>\n    ");
+  stack1 = helpers.each.call(depth0, "record", "in", "data.codeproject", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(5, program5, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n  </tbody>\n</table>\n\n");
   return buffer;

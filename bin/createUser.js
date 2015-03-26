@@ -44,9 +44,9 @@ we.bootstrap(function(err, we) {
     userStub.email = userStub.email.replace('\n','');
     userStub.password = sget('What is the password?');
     userStub.password = userStub.password.replace('\n','');
-  } else {
-    we.log.info('I will create the user: ', userStub);
   }
+
+  we.log.info('I will create the user: ', userStub);
 
   we.db.models.user.create(userStub)
   .done(function (err, user) {
