@@ -1,6 +1,6 @@
 {
   "name": "deployer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "main": "./app.js",
   "scripts": {
@@ -8,10 +8,9 @@
   },
   "dependencies": {
     "grunt-cli": "^0.1.13",
-    "grunt-contrib-copy": "^0.8.0",
     "lodash": "^3.3.1",
-    "we-theme-admin-default": "0.0.5",
-    "we-theme-site-wejs": "0.0.4"
+    "we-theme-admin-default": "0.3.0",
+    "we-theme-site-wejs": "0.3.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
